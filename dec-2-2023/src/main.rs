@@ -8,13 +8,17 @@ struct Cubes {
     blue: u32,
 }
 
-impl Default for Cubes {
+impl Cubes {
     fn default() -> Self {
         Self {
             red: 12,
             green: 13,
             blue: 14,
         }
+    }
+
+    fn power(&self) -> u32 {
+        return self.red * self.green * self.blue;
     }
 }
 
@@ -39,6 +43,30 @@ impl Game {
         }
 
         return true
+    }
+
+    fn minimum_cubes(&self) -> Cubes {
+        let mut min_cubes = Cubes {
+            red: 0,
+            green: 0,
+            blue: 0,
+        };
+
+        for pull in &self.pulls {
+            for cube in pull {
+                if min_cubes.red < cube.red {
+                    min_cubes.red = cube.red;
+                }
+                if min_cubes.green < cube.green {
+                    min_cubes.green = cube.green;
+                }
+                if min_cubes.blue < cube.blue {
+                    min_cubes.blue = cube.blue;
+                }
+            }     
+        }
+
+        return min_cubes
     }
 
     fn from_line(line: &str) -> Game {
@@ -82,17 +110,23 @@ fn main() {
     let bag = Cubes::default();
     println!("Bag {:?}", bag);
     let mut games: Vec<Game> = Vec::new();
-    let mut sumOfIds: u32 = 0;    
+    let mut sum_of_ids: u32 = 0; 
+    let mut sum_min_power: u32 = 0;
 
     for line in file_lines {
         let game = Game::from_line(line);
         if game.possible() {
-            // sumOfIds += game.id;
-            println!("Game: {} possible", game.id);
-            sumOfIds += game.id;
+            // println!("Game: {} possible", game.id);
+            sum_of_ids += game.id;
         }
+
+        let min_cubes = game.minimum_cubes();
+        println!("Game: {} minimum cubes: {:?}", game.id, min_cubes);
+        sum_min_power += min_cubes.power();
+
         games.push(game);
     }
 
-    println!("Sum of possible ids: {}", sumOfIds);
+    println!("Sum of possible ids: {}", sum_of_ids);
+    println!("Sum of minimum power: {}", sum_min_power);
 }
