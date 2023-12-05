@@ -31,6 +31,9 @@ fn main() {
     let mut numbers: Vec<PartNumber> = Vec::new();
     let mut symbols: Vec<SymbolPosition> = Vec::new();
 
+    // part 2
+    let mut gear_ratio_sum = 0;
+
     for (i, line) in file_lines.iter().enumerate() {
         for cap in re_number.captures_iter(line) {
             let number = cap[0].parse::<i32>().unwrap();
@@ -64,6 +67,8 @@ fn main() {
         // only get numbers that are either on the line before, the same line, or the line after the symbol
         let potential_numbers: Vec<&PartNumber> = numbers.iter().filter(|&x| x.line == symbol.line || x.line == symbol.line - 1 || x.line == symbol.line + 1).collect();
 
+        let mut adjacent_numbers: Vec<&PartNumber> = Vec::new();
+
         println!("SYMBOL: {:?}", symbol);
         // check to see if number is adjacent to symbol
         for number in &potential_numbers {
@@ -92,12 +97,18 @@ fn main() {
             }
 
             if adjacent {
+                adjacent_numbers.push(number);
                 total += number.value;
             }
+        }
+
+        if(adjacent_numbers.len() == 2) {
+            gear_ratio_sum += adjacent_numbers[0].value * adjacent_numbers[1].value;
         }
         
         println!("---");
     }
 
     println!("Total: {}", total);
+    println!("Gear Ratio Sum: {}", gear_ratio_sum);
 }
