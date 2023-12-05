@@ -63,7 +63,7 @@ impl Game {
                 if min_cubes.blue < cube.blue {
                     min_cubes.blue = cube.blue;
                 }
-            }     
+            }
         }
 
         return min_cubes
