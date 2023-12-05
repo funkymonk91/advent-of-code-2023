@@ -26,7 +26,7 @@ fn main() {
     let mut total = 0;
     
     let re_number = Regex::new(r"\d+").unwrap();
-    let re_symbol = Regex::new(r"[/@$=&#-+%]").unwrap();
+    let re_symbol = Regex::new(r"[^a-zA-Z0-9\.]").unwrap();
 
     let mut numbers: Vec<PartNumber> = Vec::new();
     let mut symbols: Vec<SymbolPosition> = Vec::new();
