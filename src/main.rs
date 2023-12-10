@@ -30,7 +30,7 @@ fn main() {
         Puzzle {
             date: "December 4 2023",
             first: "✅",
-            second: "",
+            second: "✅",
         },
         Puzzle {
             date: "December 5 2023",
