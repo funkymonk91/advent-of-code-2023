@@ -59,7 +59,5 @@ fn main() {
         },
     ];
 
-    print_stdout(data.with_title());
-    
-    
+    print_stdout(data.with_title()).unwrap();
 }
