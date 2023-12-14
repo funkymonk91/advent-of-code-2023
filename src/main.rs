@@ -34,7 +34,7 @@ fn main() {
         },
         Puzzle {
             name: "Day 5: If You Give A Seed A Fertilizer",
-            first: "",
+            first: "✅",
             second: "",
         },
         Puzzle {
