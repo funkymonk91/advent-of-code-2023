@@ -1,0 +1,5 @@
+{
+    "rust-analyzer.linkedProjects": [
+        "./dec-5-2023/Cargo.toml"
+    ]
+}
