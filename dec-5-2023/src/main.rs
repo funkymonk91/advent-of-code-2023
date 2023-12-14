@@ -1,5 +1,6 @@
 use std::fs;
 use regex::Regex;
+use rayon::prelude::*;
 
 fn main() {
     let file_path = "src/input.txt";
@@ -7,10 +8,11 @@ fn main() {
         .expect("Something went wrong reading the file");
     let file_lines: Vec<_> = contents.lines().collect();
 
-    println!("Part One: Lowest Location {}", part_1(file_lines));
+    println!("Part One: Lowest Location {}", part_1(&file_lines));
+    println!("Part Two: Lowest Location {}", part_2(&file_lines));
 }
 
-fn part_1(file_lines: Vec<&str>) -> i64 {
+fn part_1(file_lines: &Vec<&str>) -> i64 {
     let first_line: Vec<_> = file_lines[0].split("seeds: ").collect();
     let seeds: Vec<i64> = first_line[1].split(" ").map(|s| s.parse().unwrap()).collect();
 
@@ -110,6 +112,94 @@ fn part_1(file_lines: Vec<&str>) -> i64 {
     return lowest_location.expect("No lowest location found")
 }
 
+fn part_2(file_lines: &Vec<&str>) -> i64 {
+    let first_line: Vec<_> = file_lines[0].split("seeds: ").collect();
+    let re_seeds = Regex::new(r"\d+ \d+").unwrap();
+
+    let seed_ranges: Vec<(i64, i64)> = re_seeds
+        .captures_iter(first_line[1])
+        .map(|cap| (cap[0].split(" ").collect::<Vec<_>>()[0].parse().unwrap(), cap[0].split(" ").collect::<Vec<_>>()[1].parse().unwrap()))
+        .collect();
+
+    let seeds: Vec<_> = seed_ranges.par_iter()
+        .flat_map(|range| (range.0 .. range.0 + range.1))
+        .collect();
+
+    // println!("Seeds: {:?}", seeds.len());
+
+    let re_line = Regex::new(r"\d+ \d+ \d+").unwrap();
+
+    let mut mappings: Vec<Mapping> = Vec::new();
+
+    let mut current_mapping: Mapping = Mapping {
+        source: "",
+        destination: "",
+        lines: Vec::new(),
+    };
+
+    for (i, line) in file_lines.iter().enumerate() {
+        if i == 0 || i == 1 {
+            continue;
+        }
+
+        if line.contains("-to-") {
+            current_mapping = Mapping {
+                source: "",
+                destination: "",
+                lines: Vec::new(),
+            };
+
+            let split: Vec<_> = line.split("-to-").collect();
+            current_mapping.source = split[0];
+            current_mapping.destination = split[1].split(" map:").collect::<Vec<_>>()[0];
+        }
+
+        if re_line.is_match(line) {
+            current_mapping.lines.push(MappingLine::from_line(line));
+        }
+        
+        // check if the line is empty or is the last line of the file
+        if i + 1 == file_lines.len() || line == &"" {
+            mappings.push(current_mapping.clone());
+        }
+    }
+    
+    let lowest_locations: Vec<_> = seeds.par_iter().map(|seed| {
+        let mut source_number = *seed;
+        let mut seed_lowest_location = None;
+    
+        for mapping in mappings.iter() {
+            let mut destination_number = -1;
+            for line in mapping.lines.iter() {
+                if source_number >= line.source_range_start && source_number <= line.source_range_start + line.range_length {
+                    destination_number = line.destination_range_start + (source_number - line.source_range_start);
+                    source_number = destination_number;
+                    break;
+                }
+            }
+    
+            if mapping.destination == "location" {
+                match seed_lowest_location {
+                    Some(lowest) => {
+                        if source_number < lowest {
+                            seed_lowest_location = Some(source_number);
+                        }
+                    },
+                    None => {
+                        seed_lowest_location = Some(source_number);
+                    }
+                }
+            }
+        }
+    
+        seed_lowest_location.expect("No lowest location found")
+    }).collect();
+    
+    let lowest_location = *lowest_locations.iter().min().unwrap();
+
+    lowest_location
+}
+
 #[derive(Debug, Clone)]
 struct Mapping<'a> {
     source: &'a str,
@@ -146,7 +236,18 @@ mod tests {
             .expect("Something went wrong reading the file");
         let file_lines: Vec<_> = contents.lines().collect();
 
-        let result = part_1(file_lines);
+        let result = part_1(&file_lines); // replace with actual function call and parameters
         assert_eq!(result, 424490994);
+    }
+
+    #[test]
+    fn test_part_2() {
+        let file_path = "src/input.txt";
+        let contents = fs::read_to_string(file_path)
+            .expect("Something went wrong reading the file");
+        let file_lines: Vec<_> = contents.lines().collect();
+
+        let result = part_2(&file_lines); // replace with actual function call and parameters
+        assert_eq!(result, 15290096);
     }
 }
