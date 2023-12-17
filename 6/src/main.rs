@@ -56,9 +56,6 @@ fn part_1 (input: &str) -> i32 {
 
     let mut answer = 1;
     race_data.iter().for_each(| race | answer *= race.margin);
-        
-    
-    
    
     answer
 }
