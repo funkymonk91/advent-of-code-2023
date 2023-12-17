@@ -39,7 +39,7 @@ fn main() {
         },
         Puzzle {
             name: "Day 6: Wait For It",
-            first: "",
+            first: "✅",
             second: "",
         },
         Puzzle {
