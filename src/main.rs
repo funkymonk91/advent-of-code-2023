@@ -39,8 +39,8 @@ fn main() {
         },
         Puzzle {
             name: "Day 6: Wait For It",
-            first: "",
-            second: "",
+            first: "✅",
+            second: "✅",
         },
         Puzzle {
             name: "Day 7: Camel Cards",
