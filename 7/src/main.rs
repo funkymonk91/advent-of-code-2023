@@ -72,9 +72,10 @@ fn part_1 (file_lines: &Vec<&str>) -> i32 {
     for (i, hand) in hands.iter().enumerate() {
         hand.cards.iter().for_each(|card| println!("{:?}", card));
         total_winnings += hand.bid * (i as i32 + 1);
-        println!("Rank: {}", i + 1);
-        println!("Hand type: {:?}", hand.hand_type());
-        println!("Bid: {}", hand.bid);
+
+        println!("{:?}", hand.hand_type());
+        
+        println!("Rank: {}, Bid: {}, Winnings: {}", i + 1, hand.bid, hand.bid * (i as i32 + 1));
         println!("---");
     }
 
@@ -156,6 +157,10 @@ impl Hand {
 
             if count == 4 {
                 hand_type = HandType::FourOfAKind;
+            }
+
+            if count == 5 {
+                hand_type = HandType::FiveOfAKind;
             }
         }
 
