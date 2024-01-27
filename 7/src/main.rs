@@ -146,11 +146,14 @@ fn part_2 (file_lines: &Vec<&str>) -> i32 {
     
     let mut total_winnings = 0;
 
+    
+    // for (i, hand) in hands.iter().filter(|hand| hand.cards.iter().any(|card| card.label == "J")).enumerate() {
     for (i, hand) in hands.iter().enumerate() {
-        hand.cards.iter().for_each(|card| println!("{:?}", card));
+        let hand_labels: Vec<String> = hand.cards.iter().map(|card| card.label.clone()).collect();
+        println!("{}", hand_labels.join(" "));
         total_winnings += hand.bid * (i as i32 + 1);
 
-        println!("Original: {:?}  Wilds: {:?}", hand.hand_type(), hand.hand_type_with_jokers());
+        println!("Original: {:?} - Wilds: {:?} - High Card: {}", hand.hand_type(), hand.hand_type_with_jokers(), hand.highCard.label);
         
         println!("Rank: {}, Bid: {}, Winnings: {}", i + 1, hand.bid, hand.bid * (i as i32 + 1));
         println!("---");
@@ -258,26 +261,18 @@ impl Hand {
         
         match hand_type {
             HandType::HighCard => {
-                if &self.highCard.label == "J" && joker_count == 1 {
-                    hand_type = HandType::HighCard;
-                }
-                else {
-                    match joker_count {
-                        1 => hand_type = HandType::Pair,
-                        2 => hand_type = HandType::ThreeOfAKind,
-                        3 => hand_type = HandType::FourOfAKind,
-                        4 => hand_type = HandType::FiveOfAKind,
-                        _ => (),
-                    }
+                match joker_count {
+                    1 => hand_type = HandType::Pair,
+                    2 => hand_type = HandType::ThreeOfAKind,
+                    3 => hand_type = HandType::FourOfAKind,
+                    4 => hand_type = HandType::FiveOfAKind,
+                    _ => (),
                 }
             },
             HandType::Pair => {
                 match joker_count {
                     1 => hand_type = HandType::ThreeOfAKind,
-                    2 => hand_type = HandType::Pair, // The pair is the jokers...
-                    3 => hand_type = HandType::FullHouse,
-                    4 => hand_type = HandType::FiveOfAKind,
-                    5 => hand_type = HandType::FiveOfAKind,
+                    2 => hand_type = HandType::ThreeOfAKind,
                     _ => (),
                 }
             },
@@ -292,14 +287,12 @@ impl Hand {
                 match joker_count {
                     1 => hand_type = HandType::FourOfAKind,
                     2 => hand_type = HandType::FiveOfAKind,
-                    3 => hand_type = HandType::ThreeOfAKind,
                     _ => (),
                 }
             },
             HandType::FourOfAKind => {
                 match joker_count {
                     1 => hand_type = HandType::FiveOfAKind,
-                    4 => hand_type = HandType::FourOfAKind,
                     _ => (),
                 }
             },
