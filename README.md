@@ -6,3 +6,4 @@
 | Day 4: Scratchcards                    |   ✅   |   ✅   |
 | Day 5: If You Give A Seed A Fertilizer |   ✅   |   ✅   |
 | Day 6: Wait For It                     |   ✅   |   ✅   |
+| Day 7: Camel Cards                     |   ✅   |   ✅   |
