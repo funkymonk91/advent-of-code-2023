@@ -41,7 +41,6 @@ fn part_1 (file_lines: &Vec<&str>) -> i32 {
         Hand {
             cards: cards.clone(),
             bid: bid,
-            highCard: cards.iter().max_by_key(|card| card.value).unwrap().clone(),
         }
     })
     .collect();
@@ -115,7 +114,6 @@ fn part_2 (file_lines: &Vec<&str>) -> i32 {
         Hand {
             cards: cards.clone(),
             bid: bid,
-            highCard: cards.iter().max_by_key(|card| card.value).unwrap().clone(),
         }
     })
     .collect();
@@ -123,19 +121,19 @@ fn part_2 (file_lines: &Vec<&str>) -> i32 {
     hands.sort_by(|a, b| {
         let a_rank = a.hand_type_with_jokers().ranking();
         let b_rank = b.hand_type_with_jokers().ranking();
-
+        
         if a_rank == b_rank {
             // compare the first card in each hand
             // if those match, check the second card, etc
             for i in 0..a.cards.len() {
                 let a_card = &a.cards[i];
                 let b_card = &b.cards[i];
-    
+
                 if a_card.value != b_card.value {
                     return a_card.value.cmp(&b_card.value);
                 }
             }
-
+            
             // If all cards have the same value, return Equal
             std::cmp::Ordering::Equal
         }
@@ -145,15 +143,13 @@ fn part_2 (file_lines: &Vec<&str>) -> i32 {
     });
     
     let mut total_winnings = 0;
-
     
-    // for (i, hand) in hands.iter().filter(|hand| hand.cards.iter().any(|card| card.label == "J")).enumerate() {
     for (i, hand) in hands.iter().enumerate() {
         let hand_labels: Vec<String> = hand.cards.iter().map(|card| card.label.clone()).collect();
         println!("{}", hand_labels.join(" "));
         total_winnings += hand.bid * (i as i32 + 1);
 
-        println!("Original: {:?} - Wilds: {:?} - High Card: {}", hand.hand_type(), hand.hand_type_with_jokers(), hand.highCard.label);
+        println!("Original: {:?} - Wilds: {:?}", hand.hand_type(), hand.hand_type_with_jokers());
         
         println!("Rank: {}, Bid: {}, Winnings: {}", i + 1, hand.bid, hand.bid * (i as i32 + 1));
         println!("---");
@@ -172,7 +168,6 @@ struct Card {
 struct Hand {
     cards: Vec<Card>,
     bid: i32,
-    highCard: Card,
 }
 
 impl Hand {
@@ -259,6 +254,10 @@ impl Hand {
 
         let mut hand_type = self.hand_type();
         
+        if joker_count == 0 {
+            return hand_type;
+        }
+        
         match hand_type {
             HandType::HighCard => {
                 match joker_count {
@@ -283,16 +282,21 @@ impl Hand {
                     _ => (),
                 }
             },
+            HandType::FullHouse => {
+                return HandType::FiveOfAKind;
+            },
             HandType::ThreeOfAKind => {
                 match joker_count {
                     1 => hand_type = HandType::FourOfAKind,
                     2 => hand_type = HandType::FiveOfAKind,
+                    3 => hand_type = HandType::FourOfAKind,
                     _ => (),
                 }
             },
             HandType::FourOfAKind => {
                 match joker_count {
                     1 => hand_type = HandType::FiveOfAKind,
+                    4 => hand_type = HandType::FiveOfAKind,
                     _ => (),
                 }
             },
@@ -300,6 +304,16 @@ impl Hand {
         }
        
         hand_type
+    }
+
+    fn hand_value(&self) -> i32 {
+        let mut hand_value = 0;
+
+        for card in &self.cards {
+            hand_value += card.value;
+        }
+
+        hand_value
     }
 }
 
